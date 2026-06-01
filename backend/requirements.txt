@@ -1,0 +1,13 @@
+fastapi
+uvicorn
+python-dotenv
+google-generativeai
+sqlalchemy
+bcrypt
+pyjwt
+pyotp
+python-multipart
+email-validator
+pydantic[email]
+slowapi
+
