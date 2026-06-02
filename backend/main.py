@@ -1,14 +1,15 @@
 from fastapi import FastAPI, HTTPException, Depends, status, Header
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.security import HTTPBearer, HTTPAuthCredentials
 from sqlalchemy.orm import Session
 from google import generativeai as genai
 from dotenv import load_dotenv
 from datetime import datetime, timedelta
+from pydantic import BaseModel
 import os
 
 from database import engine, SessionLocal
 from models import User, Advocate, ClientHistory
+
 from schemas import (
     UserRegisterRequest, UserLoginRequest, UserResponse,
     AdvocateRegisterRequest, AdvocateLoginRequest, AdvocateResponse, AdvocateProfileResponse,
@@ -38,7 +39,6 @@ app.add_middleware(
 )
 
 # Security
-security = HTTPBearer()
 
 # Database
 User.metadata.create_all(bind=engine)
@@ -54,9 +54,14 @@ def get_db():
         db.close()
 
 
-def verify_token(credentials: HTTPAuthCredentials = Depends(security)):
+def verify_token(authorization: str = Header(None)):
     """Verify JWT token"""
-    token = credentials.credentials
+    if not authorization or not authorization.startswith("Bearer "):
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Missing or invalid authorization header"
+        )
+    token = authorization.replace("Bearer ", "")
     payload = JWTSecurity.verify_access_token(token)
     if payload is None:
         raise HTTPException(
@@ -521,27 +526,6 @@ def seed_client_history():
 async def startup_event():
     seed_client_history()
     print("LegalSakhi backend started successfully")
-
-                    "consultation_date": "20 May 2026",
-                    "status": "Ongoing",
-                },
-                {
-                    "advocate_id": 1,
-                    "client_name": "Anjali Deshmukh",
-                    "case_category": "Divorce",
-                    "consultation_date": "08 May 2026",
-                    "status": "Pending",
-                },
-            ]
-            for row in sample_history:
-                db.add(ClientHistory(**row))
-            db.commit()
-    finally:
-        db.close()
-
-
-ensure_advocate_schema()
-seed_client_history()
 
 app.add_middleware(
     CORSMiddleware,
