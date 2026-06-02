@@ -1,5 +1,5 @@
 import React from 'react';
-import { FaStar, FaMapMarkerAlt, FaBriefcase, FaGraduate, FaWhatsapp, FaCheckCircle, FaPhone } from 'react-icons/fa';
+import { FaStar, FaMapMarkerAlt, FaBriefcase, FaGraduationCap, FaWhatsapp, FaCheckCircle, FaPhone } from 'react-icons/fa';
 import '../styles/AdvocateCard.css';
 
 export default function AdvocateCard({ advocate }) {
@@ -51,7 +51,7 @@ export default function AdvocateCard({ advocate }) {
         </div>
 
         <div className="detail-item">
-          <FaGraduate className="detail-icon" />
+          <FaGraduationCap className="detail-icon" />
           <div>
             <div className="detail-label">Experience</div>
             <div className="detail-value">{advocate.experience} years</div>
